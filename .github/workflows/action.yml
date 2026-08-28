@@ -1,4 +1,4 @@
-name: Run Python 2 Setup Blob on Windows
+name: Build tinypy Blob on Windows
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  run-python2:
+  build-tinypy-blob:
     runs-on: windows-latest
 
     steps:
@@ -19,6 +19,20 @@ jobs:
       with:
         python-version: '2.7'
 
-    - name: 執行 setup.py blob (Run setup)
+    - name: 建立產物目錄 (Ensure build directory exists)
+      run: |
+        if (!(Test-Path build)) { New-Item -ItemType Directory -Path build }
+      shell: powershell
+
+    - name: 執行 setup.py blob 打包 (Run setup.py blob)
       run: |
         python setup.py blob
+
+    - name: 上傳產物 (Upload tinypy blob artifacts)
+      uses: actions/upload-artifact@v4
+      with:
+        name: tinypy-blob-files
+        path: |
+          build/tinypy.h
+          build/tinypy.c
+        if-no-files-found: error
