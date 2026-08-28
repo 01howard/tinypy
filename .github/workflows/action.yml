@@ -1,0 +1,24 @@
+name: Run Python 2 Setup Blob on Windows
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  run-python2:
+    runs-on: windows-latest
+
+    steps:
+    - name: 檢出程式碼 (Check out repository)
+      uses: actions/checkout@v4
+
+    - name: 設定 Python 2.7 (Setup Python 2.7)
+      uses: actions/setup-python@v5
+      with:
+        python-version: '2.7'
+
+    - name: 執行 setup.py blob (Run setup)
+      run: |
+        python setup.py blob
