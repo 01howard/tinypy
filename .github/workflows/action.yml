@@ -2,9 +2,9 @@ name: Build tinypy Blob on Windows
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -12,24 +12,30 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: 檢出程式碼 (Check out repository)
+    - name: 檢出程式碼
       uses: actions/checkout@v4
 
-    - name: 設定 Python 2.7 (Setup Python 2.7)
-      uses: actions/setup-python@v5
-      with:
-        python-version: '2.7'
+    - name: 強制用 Chocolatey 安裝 Python 2.7
+      run: |
+        choco install python2 -y
+        echo "C:\Python27" >> $env:GITHUB_PATH
+        echo "C:\Python27\Scripts" >> $env:GITHUB_PATH
+      shell: powershell
 
-    - name: 建立產物目錄 (Ensure build directory exists)
+    - name: 檢查 Python 版本
+      run: |
+        python --version
+
+    - name: 建立產物目錄
       run: |
         if (!(Test-Path build)) { New-Item -ItemType Directory -Path build }
       shell: powershell
 
-    - name: 執行 setup.py blob 打包 (Run setup.py blob)
+    - name: 執行 setup.py blob
       run: |
         python setup.py blob
 
-    - name: 上傳產物 (Upload tinypy blob artifacts)
+    - name: 上傳產物
       uses: actions/upload-artifact@v4
       with:
         name: tinypy-blob-files
